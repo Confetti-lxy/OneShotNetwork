@@ -1,0 +1,139 @@
+# 在深度学习网络中,.yaml文件通常被用来定义模型的架构、超参数、数据预处理方式等配置信息.
+# 这些配置信息可以被用于训练模型、评估模型性能、调整模型超参数等.
+# 在模型架构的定义中,.yaml文件通常包括模型的各个层的类型、参数和超参数的设置,
+# 如卷积神经网络的卷积层、池化层、全连接层等.
+# 在超参数的定义中,.yaml文件通常包括学习率、优化器类型、正则化方法、训练批次大小等.
+# 在数据预处理的定义中,.yaml文件通常包括对输入数据进行预处理的方式,如归一化、标准化、随机翻转等.
+# 使用.yaml文件进行配置可以使得配置信息更加清晰、易于管理和维护.
+# 另外,许多深度学习框架,如PyTorch、TensorFlow等,都提供了支持.yaml文件的配置方式,
+# 这使得用户可以方便地在不同的深度学习框架之间进行转换和迁移.
+
+# dataset_params通常指用于配置数据集参数的一组配置项.
+# 这些配置项可以被用于构建数据加载器,从而将数据集导入深度学习模型中进行训练和评估.
+# 使用dataset_params配置数据集参数可以使得数据集的处理更加灵活和方便,
+# 同时也可以避免在代码中硬编码数据集路径和参数等信息,从而使得代码更加易于维护和复用.
+dataset_params:
+  # 数据集路径
+  root_dir: /zlh/VoxCeleb/first-order-256
+  # 在视频处理中,frame_shape通常是一个包含三个元素的元组,
+  # 即(frame_height, frame_width, num_channels).
+  # 其中,frame_height和frame_width分别表示每个帧的高度和宽度,
+  # num_channels表示每个帧的颜色通道数.
+  # 例如,如果每个帧的高度为256像素,宽度为256像素,且颜色通道数为3,则可以表示为(256, 256, 3).
+  frame_shape: [ 256, 256, 3 ]
+  # 在深度学习中,id_sampling为True表示对数据进行采样.
+  # 具体来说,如果id_sampling为True,则会在训练过程中随机选择一部分数据进行训练,
+  # 而不是使用所有的训练数据进行训练.
+  id_sampling: True
+  # 在深度学习中,如果pairs_list为None,则通常表示使用原始数据集进行训练,而不是使用配对数据进行训练.
+  # 这种情况适用于一些常见的深度学习任务,例如图像分类、目标检测等.
+  # 在这些任务中,输入数据通常是一组独立的图像或文本,而目标输出则是每个图像或文本的类别标签、边界框、序列等.
+  # 此时训练数据集通常由一组独立的输入和目标输出数据组成,例如一组图像和相应的标签.
+  # 在训练过程中,模型将使用每个输入数据来生成预测输出,然后与目标输出进行比较以计算损失,并更新模型参数.
+  pairs_list: None
+  # 在深度学习中,augmentation_params通常指用于数据增强的参数配置.
+  # 数据增强是一种常用的技术,它通过对训练数据进行变换和扰动来生成更多的训练样本,以增强模型的鲁棒性和泛化能力.
+  augmentation_params:
+    # 在深度学习中,flip_param通常指用于图像翻转的参数配置.
+    # 图像翻转是一种常用的数据增强方法,它可以将输入图像在水平或垂直方向上进行翻转,
+    # 从而生成更多的训练样本,以增强模型的鲁棒性和泛化能力.
+    flip_param:
+      # 其中horizontal_flip和time_flip分别控制图像是否进行水平和时间维度上的翻转,
+      # 如果设置为True,则表示进行翻转,否则不进行翻转.
+      # 具体来说,horizontal_flip控制图像在水平方向上进行翻转,可以增加数据集的多样性,
+      # 避免模型对物体在水平方向上的偏差感知.time_flip控制数据在时间维度上进行翻转,
+      # 主要应用于视频类数据,可以增加数据集的多样性,避免模型对时间方向上的偏差感知.
+      # 需要注意的是,在设置翻转参数时,需要根据具体的数据集和模型来选择合适的翻转方式和程度,
+      # 避免数据失真和信息丢失,以获得最佳的训练效果.
+      horizontal_flip: True
+      time_flip: True
+    # 这段代码表示图像增强中的颜色抖动参数配置,其中jitter_param包含了4个子参数,
+    # 分别是brightness、contrast、saturation和hue,
+    # 用于控制图像在亮度、对比度、饱和度和色调方面的变化程度.
+    # 具体来说:
+    # brightness用于控制图像亮度的变化程度,取值范围一般为[0, 1],数值越大表示亮度变化越明显；
+    # contrast用于控制图像对比度的变化程度,取值范围也为[0, 1],数值越大表示对比度变化越明显；
+    # saturation用于控制图像饱和度的变化程度,取值范围同样为[0, 1],数值越大表示饱和度变化越明显；
+    # hue用于控制图像色调的变化程度,取值范围为[-0.5, 0.5],数值越大表示色调变化越明显.
+    # 需要注意的是,在设置颜色抖动参数时,需要根据具体的数据集和模型来选择合适的参数取值,
+    # 避免数据失真和信息丢失,以获得最佳的训练效果.
+    # 同时,也可以结合其他的数据增强方法,如图像翻转、旋转、裁剪等,以获得更丰富和有效的训练样本.
+    jitter_param:
+      brightness: 0.1
+      contrast: 0.1
+      saturation: 0.1
+      hue: 0.1
+
+
+model_params:
+  common_params:
+    num_kp: 15
+    image_channel: 3
+    feature_channel: 32
+    estimate_jacobian: False   # True
+  kp_detector_params:
+    temperature: 0.1
+    block_expansion: 32
+    max_features: 1024
+    scale_factor: 0.25         # 0.25
+    num_blocks: 5
+    reshape_channel: 16384  # 16384 = 1024 * 16
+    reshape_depth: 16
+  he_estimator_params:
+    block_expansion: 64
+    max_features: 2048
+    num_bins: 66
+  generator_params:
+    block_expansion: 64
+    max_features: 512
+    num_down_blocks: 2
+    reshape_channel: 32
+    reshape_depth: 16         # 512 = 32 * 16
+    num_resblocks: 6
+    estimate_occlusion_map: True
+    dense_motion_params:
+      block_expansion: 32
+      max_features: 1024
+      num_blocks: 5
+      # reshape_channel: 32
+      reshape_depth: 16
+      compress: 4
+  discriminator_params:
+    scales: [ 1 ]
+    block_expansion: 32
+    max_features: 512
+    num_blocks: 4
+    sn: True
+
+train_params:
+  num_epochs: 300
+  num_repeats: 75
+  epoch_milestones: [ 180, ]
+  lr_generator: 2.0e-4
+  lr_discriminator: 2.0e-4
+  lr_kp_detector: 2.0e-4
+  lr_he_estimator: 2.0e-4
+  gan_mode: 'hinge'    # hinge or ls
+  batch_size: 32
+  scales: [ 1, 0.5, 0.25, 0.125 ]
+  checkpoint_freq: 10
+  hopenet_snapshot: '/zlh/Project/deep-head-pose/checkpoints/hopenet_robust_alpha1.pkl'
+  transform_params:
+    sigma_affine: 0.05
+    sigma_tps: 0.005
+    points_tps: 5
+  loss_weights:
+    generator_gan: 1
+    discriminator_gan: 1
+    feature_matching: [ 10, 10, 10, 10 ]
+    perceptual: [ 10, 10, 10, 10, 10 ]
+    equivariance_value: 10
+    equivariance_jacobian: 0    # 10
+    keypoint: 10
+    headpose: 20
+    expression: 5
+
+visualizer_params:
+  kp_size: 5
+  draw_border: True
+  colormap: 'gist_rainbow'
