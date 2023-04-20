@@ -64,14 +64,39 @@ dataset_params:
       saturation: 0.1
       hue: 0.1
 
-
+# model_params是一个用于指定模型超参数和配置的部分,
+# 包括模型的类型、层数、通道数、卷积核大小、池化方式、正则化方式等等.
+# 在深度学习任务中,模型的超参数和配置往往对模型的性能和训练效果有着至关重要的影响.
+# 具体来说,model_params中可以包含多个子参数,如model_type用于指定模型的类型,
+# 常见的有卷积神经网络(CNN)、循环神经网络(RNN)和转移神经网络(Transformer)等；
+# num_layers用于指定模型的层数,num_channels用于指定卷积层的输出通道数,
+# kernel_size用于指定卷积核的大小,pooling_type用于指定池化方式,如最大池化或平均池化等；
+# regularization_type用于指定正则化方式,如L1、L2或dropout等.
+# 需要注意的是,在设置模型参数时,需要根据具体的任务和数据集来选择合适的参数取值,
+# 避免模型过拟合或欠拟合,以获得最佳的训练效果和泛化性能.
+# 同时,也可以结合其他的技术和方法,如迁移学习、模型融合等,进一步提高模型的性能和鲁棒性.
 model_params:
+  # common_params一般用于存储与模型或任务相关的通用参数配置,
+  # 这些参数可以被整个模型或任务所共享,用于控制模型的整体行为和性能.
   common_params:
+    # num_kp一般用于指定检测或跟踪关键点的数量,如人脸关键点、手部关键点等,数值大小一般与具体任务相关；
+    # image_channel用于指定输入图像的通道数,一般为1或3,分别表示灰度图或RGB图；
+    # feature_channel用于指定卷积或特征提取层的输出通道数,一般越大表示特征表达能力越强；
+    # estimate_jacobian用于控制是否估计雅各比矩阵,如果设置为True,表示需要计算特征点的空间坐标,
+    # 一般在三维重建或位姿估计等任务中会用到.
     num_kp: 15
     image_channel: 3
     feature_channel: 32
     estimate_jacobian: False   # True
+  # kp_detector_params一般用于存储关键点检测器的参数配置,这些参数主要用于控制关键点检测器的行为和性能.
   kp_detector_params:
+    # temperature:温度参数,用于调节softmax函数输出的概率分布的平滑程度,一般取较小的值可以得到更加尖锐的概率分布,以提高模型的鲁棒性和泛化能力.
+    # block_expansion:通道扩展因子,用于控制卷积块中卷积层输出通道数的扩展倍数,以增加模型的容量和表达能力.
+    # max_features:特征通道最大数量,用于限制特征通道数的最大值,以避免特征通道数量过多导致计算量过大或过拟合.
+    # scale_factor:金字塔缩放因子,用于控制金字塔层数之间的缩放倍数,以增加特征表达的尺度和范围.
+    # num_blocks:卷积块数量,用于控制卷积块的数量,以增加模型的深度和复杂度.
+    # reshape_channel:特征通道重塑数量,用于将特征图中的空间维度展平并重塑特征通道维度的数量.
+    # reshape_depth:特征通道重塑深度,用于控制特征通道重塑后的深度大小,以控制特征图的空间分辨率和通道维度大小.
     temperature: 0.1
     block_expansion: 32
     max_features: 1024
@@ -79,10 +104,16 @@ model_params:
     num_blocks: 5
     reshape_channel: 16384  # 16384 = 1024 * 16
     reshape_depth: 16
+  # 控制人体姿态估计器指的是通过调整模型参数、优化算法、改变数据输入等方式,
+  # 控制人体姿态估计器的性能和精度,使其能够更好地适应不同的应用场景和需求.
   he_estimator_params:
+    # block_expansion:通道扩展因子,用于控制卷积块中卷积层输出通道数的扩展倍数,以增加模型的容量和表达能力.
+    # max_features:特征通道最大数量,用于限制特征通道数的最大值,以避免特征通道数量过多导致计算量过大或过拟合.
+    # num_bins:关键点数量,用于控制输出的关键点数量,一般和人体姿态的自由度和关键点的数量有关.
     block_expansion: 64
     max_features: 2048
     num_bins: 66
+  # generator_params 是指深度学习中的生成器模型参数,主要用于生成对抗网络 (GAN) 中的生成器部分.
   generator_params:
     block_expansion: 64
     max_features: 512
