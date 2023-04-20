@@ -115,6 +115,15 @@ model_params:
     num_bins: 66
   # generator_params 是指深度学习中的生成器模型参数,主要用于生成对抗网络 (GAN) 中的生成器部分.
   generator_params:
+    # block_expansion：表示每个卷积块中卷积核的扩展系数,即在每个卷积块中卷积核的数量是上一层卷积核数量的多少倍.
+    # 例如,在该参数中的值为 64 时,表示每个卷积块中的卷积核数量是上一层卷积核数量的 64 倍.
+    # max_features：表示生成器网络中最大的卷积核数量,这个值一般是 2 的整数次幂,用于保证每层特征图的维度都是 2 的整数次幂,
+    # 这样可以方便地进行上采样和下采样.
+    # num_down_blocks：表示生成器网络中下采样操作的数量,也就是 U-Net 网络中的下采样部分.
+    # reshape_channel：表示生成器网络中 reshape 操作之后的通道数.
+    # reshape_depth：表示生成器网络中 reshape 操作之后的深度,即特征图的高度.
+    # num_resblocks：表示生成器网络中残差块的数量,用于增强模型的非线性建模能力.
+    # estimate_occlusion_map：表示是否要在生成的姿态图像中估计遮挡区域的掩模.
     block_expansion: 64
     max_features: 512
     num_down_blocks: 2
@@ -122,21 +131,43 @@ model_params:
     reshape_depth: 16         # 512 = 32 * 16
     num_resblocks: 6
     estimate_occlusion_map: True
+    # dense_motion_params是控制稠密运动估计器的参数.
     dense_motion_params:
+      # block_expansion: 控制特征块的通道数,即每个块内特征的维度大小.
+      # max_features: 控制特征图的最大通道数.这是为了控制模型的复杂度和计算效率,防止特征图通道数量过大而导致计算资源不足.
+      # num_blocks: 控制编码器/解码器中的块数量.每个块都包含一些卷积层,用于处理特征图,并将其传递到下一个块.
+      # 更多块意味着更多的层和更高的复杂度,但同时也会增加计算成本.
+      # reshape_depth: 将特征图重新塑形的深度.这是为了将特征图压缩成一维向量,以便在解码器中重新构建图像时使用.
+      # compress: 压缩因子.这是在将运动向量从稠密运动估计器传递到解码器时使用的,它将运动向量压缩成一个较小的向量,
+      # 从而降低计算成本.较小的压缩因子将导致更少的信息损失,但也可能会导致更高的计算成本.
       block_expansion: 32
       max_features: 1024
       num_blocks: 5
       # reshape_channel: 32
       reshape_depth: 16
       compress: 4
+  # 用来定义判别器的参数集合
   discriminator_params:
+    # scales: 对于多尺度训练,定义每个尺度的倍率,这里只有一个尺度,取值为1.
+    # block_expansion: 残差块的输出通道数,即输入通道数的倍数.
+    # max_features: 通道数的最大值,超过这个值后输出通道数不再增加.
+    # num_blocks: 残差块的数量.
+    # sn: 是否使用谱归一化（spectral normalization）,用于稳定训练过程.
     scales: [ 1 ]
     block_expansion: 32
     max_features: 512
     num_blocks: 4
-    sn: True
+    sn: True # 使用谱归一化
 
+# train_params是一个包含各种训练超参数的字典,用于指定训练过程的各种设置
 train_params:
+  # num_epochs: 训练的总轮数.
+  # num_repeats: 每个轮数训练的迭代次数.每次迭代中,数据集中的一个batch会被输入到模型中进行训练,一个batch中包含多个数据样本.
+  # epoch_milestones: 定义学习率调整的时间点,即在训练的哪些轮数中需要调整学习率.默认情况下,只在第180轮调整学习率.
+  # lr_generator: 生成器的学习率,即生成器网络参数更新的速率.
+  # lr_discriminator: 判别器的学习率,即判别器网络参数更新的速率.
+  # lr_kp_detector: 关键点检测器的学习率,即关键点检测器网络参数更新的速率.
+  # lr_he_estimator: 人体姿态估计器的学习率,即人体姿态估计器网络参数更新的速率.
   num_epochs: 300
   num_repeats: 75
   epoch_milestones: [ 180, ]
@@ -144,16 +175,37 @@ train_params:
   lr_discriminator: 2.0e-4
   lr_kp_detector: 2.0e-4
   lr_he_estimator: 2.0e-4
+  # gan_mode指定了GAN的loss计算方式,可以是"hinge"或"ls"；
+  # batch_size是训练时的batch size；
+  # scales是输入图片经过金字塔缩放后的尺度系数；
+  # checkpoint_freq表示每隔多少个epoch保存一次checkpoint；
+  # hopenet_snapshot是头部姿态估计器的预训练模型路径.
   gan_mode: 'hinge'    # hinge or ls
   batch_size: 32
   scales: [ 1, 0.5, 0.25, 0.125 ]
   checkpoint_freq: 10
   hopenet_snapshot: '/zlh/Project/deep-head-pose/checkpoints/hopenet_robust_alpha1.pkl'
+  # transform_params是数据增强时使用的参数,其中包含了仿射变换和thin-plate spline(TPS)变换的参数.
+  # sigma_affine是仿射变换的参数,表示随机仿射变换的标准差.具体来说,
+  # 如果将一个图像的像素坐标乘以一个2x2的随机仿射矩阵,这个参数就决定了这个矩阵元素的随机程度.
+  # sigma_tps是TPS变换的参数,表示TPS变换的控制点的偏差.TPS变换是一种非线性变换,
+  # 可以更好地捕捉人脸的形变,将控制点从一个位置扰动到另一个位置会使变换产生细微的扰动,这个参数决定了这个偏差的随机程度.
+  # points_tps是TPS变换的参数,表示TPS变换的控制点数目.控制点越多,变换的自由度越高,但也会导致更多的计算量.
   transform_params:
     sigma_affine: 0.05
     sigma_tps: 0.005
     points_tps: 5
+  # 这些是训练时不同损失的权重,每个损失都有自己的权重,用于平衡每个损失对整个训练过程的贡献.
   loss_weights:
+    # generator_gan: 生成器的对抗损失,用于生成器欺骗鉴别器.
+    # discriminator_gan: 鉴别器的对抗损失,用于判别真实和虚假样本.
+    # feature_matching: 特征匹配损失,用于测量生成图像和真实图像在不同尺度下的特征差异.
+    # perceptual: 感知损失,用于测量生成图像和真实图像的语义相似性.
+    # equivariance_value: 生成器的等变损失,用于确保生成的姿势估计的值在变换（例如旋转）之后不会改变.
+    # equivariance_jacobian: 生成器的等变损失,用于确保生成的姿势估计的雅可比矩阵在变换之后不会改变.
+    # keypoint: 用于保持生成的关键点和真实关键点之间的一致性.
+    # headpose: 用于保持生成的头部姿态和真实头部姿态之间的一致性.
+    # expression: 用于保持生成的面部表情和真实面部表情之间的一致性.
     generator_gan: 1
     discriminator_gan: 1
     feature_matching: [ 10, 10, 10, 10 ]
@@ -164,7 +216,11 @@ train_params:
     headpose: 20
     expression: 5
 
+# visualizer_params 是可视化参数,用于控制模型训练过程中的可视化输出
 visualizer_params:
+  # kp_size: 绘制关键点时点的大小,默认为5
+  # draw_border: 是否在图片周围绘制边框,默认为True
+  # colormap: 绘制热力图的颜色映射,默认为'gist_rainbow'
   kp_size: 5
   draw_border: True
   colormap: 'gist_rainbow'
